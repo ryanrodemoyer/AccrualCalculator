@@ -1,0 +1,676 @@
+﻿@model Guid
+
+<div id="app"></div>
+
+@await Html.PartialAsync("_VueScriptsPartial")
+
+<script type="text/javascript">
+    var accrualFields = 'accrualId accrualRate name startingDate startingHours lastModified hourlyRate isHeart isArchived minHours maxHours accrualFrequency ending dayOfPayA dayOfPayB';
+    
+    var App = Vue.component('default-component',
+        {
+            template: '#default-component',
+            data: function() {
+                return {
+                    accrual: {}
+                };
+            },
+            created: function() {
+                this.getAccrual(this, function() {
+                    alert('Error retrieving the accrual. Try again.');
+                });
+            },
+            provide: function() {
+              return {
+                  getAccrual: this.getAccrual,
+                  updateAccrual: this.updateAccrual,
+                  deleteAccrual: this.deleteAccrual,
+                  addAccrualAction: this.addAccrualAction,
+                  deleteAccrualAction: this.deleteAccrualAction,
+                  copyAccrual: this.copyAccrual
+              }  
+            },
+            methods: {
+                getAccrual: function(instance, errorCallback) {
+                    axios.post('/graphql',
+                        {
+                            query:
+                                "query($accrualId: ID!) { accrual(accrualId: $accrualId) { " + accrualFields + " rows { rowId currentAccrual accrualDate hoursUsed actions { actionDate amount note dateCreated } } actions {accrualActionId accrualAction actionDate amount note dateCreated }} }",
+                            variables: {
+                                accrualId: "@Model"
+                            }
+                        }).then(function(res) {
+                            if (res.data.errors) {
+                                instance.accrual = undefined;
+                                
+                                console.log(res.data);
+                                console.log('Errors returned from the API. Check the console for additional information.');
+                                if (errorCallback) {
+                                    errorCallback();
+                                }
+                            } else {
+                                instance.accrual = res.data.data.accrual;
+                            }
+                        }).catch(function(err) {
+                            console.log(err);
+                            console.log('Error communicating with the API. Check the console for additional information.');
+                        
+                            if (errorCallback) {
+                                errorCallback();
+                            }
+                    });
+                },
+                copyAccrual: function() {
+                    var a = Object.assign({}, this.accrual);
+                    delete a.actions;
+                    delete a.rows;
+                    delete a.lastModified;
+                    delete a.accrualId;
+
+                    return a;
+                },
+                updateAccrual: function(mutated, successCallback, errorCallback) {
+                    var self = this;
+                    axios.post('/graphql',
+                        {
+                            query:
+                                "mutation($accrualId: ID!, $accrual: AccrualInputType!) { modifyAccrual(accrualId: $accrualId, accrual: $accrual) {  " + accrualFields + " rows { rowId currentAccrual accrualDate hoursUsed actions { actionDate amount note dateCreated } } actions {accrualActionId accrualAction actionDate amount note dateCreated }} }",
+                            variables: {
+                                accrualId: self.accrual.accrualId,
+                                accrual: mutated
+                            }
+                        }).then(function(res) {
+                        if (res.data.errors) {
+                            console.log(res.data);
+                            console.log('Errors returned from the API. Check the console for additional information.');
+                            if (errorCallback) {
+                                errorCallback();
+                            }
+                        } else {
+                            self.accrual = res.data.data.modifyAccrual;
+                            if (successCallback) {
+                                successCallback();
+                            }
+                        }
+                    }).catch(function(err) {
+                        console.log(err);
+                        console.log('Error communicating with the API. Check the console for additional information.');
+                        
+                        if (errorCallback) {
+                            errorCallback();
+                        }
+                    });
+                },
+                deleteAccrual: function(successCallback, errorCallback) {
+                    var self = this;
+                    axios.post('/graphql',
+                        {
+                            query:
+                                "mutation($accrualId: ID!) { deleteAccrual(accrualId: $accrualId) { result }}",
+                            variables: {
+                                accrualId: self.accrual.accrualId
+                            }
+                        }).then(function(res) {
+                        if (res.data.errors) {
+                            console.log(res.data);
+                            console.log('Errors returned from the API. Check the console for additional information.');
+                            if (errorCallback) {
+                                errorCallback();
+                            }
+                        } else {
+                            self.accrual = undefined;
+                            if (successCallback) {
+                                successCallback();
+                            }
+                        }
+                    }).catch(function(err) {
+                        console.log(err);
+                        console.log('Error communicating with the API. Check the console for additional information.');
+                        
+                        if (errorCallback) {
+                            errorCallback();
+                        }
+                    });
+                },
+                addAccrualAction: function(adjustment, successCallback, errorCallback) {
+                    var self = this;
+                    axios.post('/graphql',
+                        {
+                            query:
+                                "mutation($accrualId:ID!, $action: AccrualActionRecordInputType!) { addAccrualAction(accrualId: $accrualId, action: $action){  " + accrualFields + " rows { rowId currentAccrual accrualDate hoursUsed actions {accrualActionId accrualAction actionDate amount note dateCreated }} actions {accrualActionId accrualAction actionDate amount note dateCreated }}}",
+                            variables: {
+                                "accrualId": self.accrual.accrualId,
+                                "action": adjustment
+                            } 
+                        })
+                        .then(function(res) {
+                            if (res.data.errors) {
+                                console.log(res.data);
+                                console.log('Errors returned from the API. Check the console for additional information.');
+                                if (errorCallback) {
+                                    errorCallback();
+                                }
+                            } else {
+                                self.accrual = res.data.data.addAccrualAction;
+                                alert('success!');
+                                if (successCallback) {
+                                    successCallback();
+                                }
+                            }
+                        }).catch(function(err) {
+                            console.log(err);
+                            console.log('Error communicating with the API. Check the console for additional information.');
+                            
+                            if (errorCallback) {
+                                errorCallback();
+                            }
+                        });
+                },
+                deleteAccrualAction: function(accrualActionId, errorCallback) {
+                    var self = this;
+                    axios.post('/graphql',
+                        {
+                            query:
+                                "mutation($accrualId: ID!, $accrualActionId: String!) { deleteAccrualAction(accrualId: $accrualId, accrualActionId: $accrualActionId) {  " + accrualFields + "  rows { rowId currentAccrual accrualDate hoursUsed actions { actionDate amount note dateCreated } } actions {accrualActionId accrualAction actionDate amount note dateCreated }} }",
+                            variables: {
+                                accrualId: self.accrual.accrualId,
+                                accrualActionId: accrualActionId
+                            }
+                        }).then(function(res) {
+                            if (res.data.errors) {
+                                console.log(res.data);
+                                console.log('Errors returned from the API. Check the console for additional information.');
+                                if (errorCallback) {
+                                    errorCallback();
+                                }
+                            } else {
+                                self.accrual = res.data.data.deleteAccrualAction;
+                            }
+                        }).catch(function(err) {
+                            console.log(err);
+                            console.log('Error communicating with the API. Check the console for additional information.');
+                        
+                            if (errorCallback) {
+                                errorCallback();
+                            }
+                        });
+                }
+            }
+        });
+</script>
+
+<script type="text/x-template" id="default-component">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="row">
+                <h1>{{ accrual.name }}</h1>
+                <accrual-table-component v-bind:accrual="accrual"></accrual-table-component>
+            </div>
+         </div>
+         
+         <div class="col-md-4">
+            <div class="row">
+                <actions-component :accrual="accrual"></actions-component>
+            </div>
+            <div class="row">
+                <cool-stats-component :accrual="accrual"></cool-stats-component>
+            </div>
+            <div class="row">
+                <add-action-component :accrual="accrual"></add-action-component>
+            </div>
+            <div class="row">
+                <action-history-component :accrual="accrual"></action-history-component>
+            </div>
+         </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var AccrualTable = Vue.component('accrual-table-component', {
+        template: '#accrual-table-component',
+        props: ['accrual'],
+        data: function() {
+            return { }
+        },
+        methods: { }
+    });
+</script>
+<script type="text/x-template" id="accrual-table-component">
+     <table class="table">
+         <thead>
+         <tr>
+             <th>Date Accrued</th>
+             <th>&nbsp;</t>
+             <th class="text-center">Hours Accrued</th>
+             <th class="text-center">Hours Adjusted</th>
+             <th class="text-center">Total Accrued</th>
+         </tr>
+         </thead>
+         <tbody>
+            <template v-for="row in accrual.rows">
+                <accrual-row-component v-bind:row="row" v-bind:accrualRate="accrual.accrualRate"></accrual-row-component>
+
+                <template v-if="row.actions !== undefined && row.actions.length > 0">
+                    <td>&nbsp;</td>
+                    <td colspan="3">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th class="text-center">Adjustment</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="action in row.actions">
+                                    <td>{{ action.actionDate }}</td>
+                                    <td align="center">{{ action.amount }}</td>
+                                    <td>{{ action.note }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </template>
+            </template>
+         </tbody>
+     </table>
+</script>
+
+<script type="text/javascript">
+    var Actions = Vue.component('accrual-row-component', {
+        template: '#accrual-row-component',
+        props: ['row', 'accrualRate'],
+        methods: { }
+    });
+</script>
+<script type="text/x-template" id="accrual-row-component">
+    <tr>
+         <td v-if="row.rowId === 0">Starting Row</td>
+         <td v-if="row.rowId === 0">&nbsp;</td>
+                  
+         @* when using a leading-zero day-of-month format, 
+         javascript subtracts a day from the actual value 
+         ex: "2018-10-07" actually represents October 6th.
+         i have no explanation for this. *@
+         <td v-if="row.rowId > 0">{{row.accrualDate}}</td>
+         
+         <td v-if="row.actions.length > 0"><span @@click=""><i class="fas fa-chevron-down"></i></span></td>
+         <td v-else></td>
+
+         <td v-if="row.rowId === 0">&nbsp;</td>
+         <td v-else align="center">{{accrualRate}}</td>
+         
+         <td v-if="row.rowId > 0" align="center">{{row.hoursUsed}}</td>
+
+         <td align="center">{{row.currentAccrual}}</td>
+     </tr>
+</script>
+
+<script type="text/javascript">
+    var Actions = Vue.component('actions-component', {
+        template: '#actions-component',
+        props: ['accrual'],
+        inject: ['updateAccrual', 'deleteAccrual', 'copyAccrual'],
+        data: function() {
+            return {
+                localAccrual: {}
+            }
+        },
+        watch: {
+            accrual: function(current, previous) {
+                if (current && current.name) {
+                    this.localAccrual = this.copyAccrual();
+                }
+            }
+        },
+        methods: {
+            updateAccrualClick: function(which) {
+                var update = false;
+                if (which === 'heart') {
+                    update = true;
+                    this.localAccrual.isHeart = !this.localAccrual.isHeart;
+                } else if (which === 'archive') {
+                    update = true;
+                    this.localAccrual.isArchived = !this.localAccrual.isArchived;
+                }
+                    
+                if (update) {
+                    this.updateAccrual(this.localAccrual);
+                }
+            },
+            deleteAccrualClick: function() {
+                var answer = confirm('THIS ACTION IS PERMANENT!\nYOUR DATA WILL BE GONE FOREVER.\nClick OK to delete the accrual forever.\nClick Cancel to you know ... not do anything.');
+                if (answer) {
+                    this.deleteAccrual(function() {
+                        alert('The accrual has been permanently removed from our system.');
+                    }, function() {
+                        alert('Error deleting the accrual. Check the console for additional information.');
+                    });
+                }
+            }
+        }
+    });
+</script>
+<script type="text/x-template" id="actions-component">
+    <div>
+        <h1>Actions</h1>
+        <span><i @@click="updateAccrualClick('heart')" v-bind:class="{redcolor: this.accrual.isHeart}" class="fas fa-heart" style="font-size: 32px;"></i></span>
+        <span><i @@click="updateAccrualClick('archive')" v-bind:class="{bluecolor: this.accrual.isArchived}"  class="fas fa-archive" style="font-size: 32px;"></i></span>
+        <span><i @@click="deleteAccrualClick" class="fas fa-trash" style="font-size: 32px;"></i></span>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var Actions = Vue.component('cool-stats-component', {
+        template: '#cool-stats-component',
+        props: ['accrual'],
+        inject: ['updateAccrual', 'copyAccrual'],
+        data: 
+            function() {
+                return {
+                    ui: {
+                        isView: true,
+                        ready: false
+                    },
+                    edit: {}
+                }
+            },
+//        watch: {
+//            accrual: function(current, previous) {
+//                if (current && current.name) {
+//                    this.edit = current;
+//                }
+//            },
+//        },
+        methods: {
+//            waitForAccrual: function() {
+//                var self = this;
+//                
+//                // check every 50ms to see if the accrual.name field is available signaling that the prop is ready
+//                function checkForAccrual()
+//                {
+//                    if (self.accrual && self.accrual.name) {
+//                        self.edit.name = self.accrual.name;
+//                        self.edit.accrualRate = self.accrual.accrualRate;
+//                        self.edit.hourlyRate = self.accrual.hourlyRate;
+//                        self.edit.minHours = self.accrual.minHours;
+//                        self.edit.maxHours = self.accrual.maxHours;
+//                        self.edit.startingDate = self.accrual.startingDate;
+//                    } else {
+//                        setTimeout(checkForAccrual, 50);
+//                    }
+//                }
+//
+//                checkForAccrual();
+//            }
+            doneClick: function() {
+                var self = this;
+                this.updateAccrual(this.edit, function() {
+                    self.edit = undefined;
+                    self.ui.isView = true;
+                });
+            },
+            editClick: function() {
+                this.edit = this.copyAccrual();
+                this.ui.isView = false;
+            },
+            discardClick: function() {
+                this.edit = undefined;
+                this.ui.isView = true;
+            }
+        },
+        computed: {
+            isView: function() {
+                return this.ui.isView;
+            }
+        },
+        created: function() {
+            // pause while we wait for the accrual prop to get populated
+            // this approach with setTimeout is a previous approach i wanted to keep around for future reference
+            // but for now i get the same effect using 'watch'
+//            this.waitForAccrual();
+        }
+    });
+</script>
+<script type="text/x-template" id="cool-stats-component">
+<div class="container-fluid">
+    <div class="row">
+        <h1>Accrual Info</h1>
+        <p>
+            <span v-if="isView">
+                <a @@click.prevent="editClick">edit...</a>
+            </span>
+            <span v-else>
+                <a @@click.prevent="doneClick">done...</a>
+                <a @@click.prevent="discardClick" class="pull-right">discard...</a>
+            </span>
+        </p>
+        <div class="form-group">
+            <label class="control-label col-md-4">Name</label>
+            <p v-if="isView" class="form-control-static col-md-8">{{ accrual.name }}</p>
+            <p v-else class="col-md-6"><input type="text" class="form-control col-md-8" name="accrual-name" v-model="edit.name" maxlength="100" /></p>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-4">Accrual Rate</label>
+            <p v-if="isView" class="form-control-static col-md-8">{{ accrual.accrualRate }}</p>
+            <p v-else class="col-md-6"><input type="number" class="form-control col-md-8" name="accrual-rate" v-model="edit.accrualRate" /></p>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-4">Hourly Rate</label>
+            <p v-if="isView" class="form-control-static col-md-8">{{ accrual.hourlyRate ? accrual.hourlyRate : "$15.00" }}</p>
+            <p v-else class="col-md-6"><input type="number" class="form-control col-md-8" name="hourly-rate" v-model="edit.hourlyRate" /></p>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-4">Min Hours</label>
+            <p v-if="isView" class="form-control-static col-md-8">{{ accrual.minHours }}</p>
+            <p v-else class="col-md-6"><input type="number" class="form-control col-md-8" name="min-hours" v-model="edit.minHours" /></p>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-4">Max Hours</label>
+            <p v-if="isView" class="form-control-static col-md-8">{{ accrual.maxHours }}</p>
+            <p v-else class="col-md-6"><input type="number" class="form-control col-md-8" name="min-hours" v-model="edit.maxHours" /></p>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-4">Starting Date</label>
+            <p v-if="isView" class="form-control-static col-md-8">{{ accrual.startingDate }}</p>
+            <p v-else class="col-md-6"><input type="date" class="form-control col-md-8" name="starting-date" v-model="edit.startingDate" /></p>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-4">Last Modified</label>
+            <p class="form-control-static col-md-8">{{ accrual.lastModified }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <pre v-if="!isView">{{this.$data}}</pre>
+    </div>    
+</div>
+</script>
+
+<script type="text/javascript">
+    var Actions = Vue.component('action-history-component', {
+        template: '#action-history-component',
+        props: ['accrual'],
+        methods: { }
+    });
+</script>
+<script type="text/x-template" id="action-history-component">
+    <div>
+        <h1>History</h1>
+        
+        <template v-if="accrual.actions">
+            <action-history-detail-component 
+                v-for="action in accrual.actions.slice().reverse()" 
+                v-bind:action="action"
+                :key="action.accrualActionId">
+            </action-history-detail-component>
+        </template>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var Actions = Vue.component('action-history-detail-component', {
+        template: '#action-history-detail-component',
+        props: ['action'],
+        inject: ['deleteAccrualAction'],
+        methods: {
+            deleteAccrualActionClick: function() {                
+                this.deleteAccrualAction(this.action.accrualActionId);
+            }
+        }
+    });
+</script>
+<script type="text/x-template" id="action-history-detail-component">
+    <div>
+        <p>
+            <span v-if="action.accrualAction !== 'CREATED'"><a @@click.prevent="deleteAccrualActionClick"><i class="fas fa-times-circle" style="color: red;"></i></a></span>
+            <strong>Accrual Action: {{ action.accrualAction }}</strong>
+        </p>
+        <p>Action Date: {{ action.actionDate }}</p>
+        <p>Action Id: {{ action.accrualActionId }}</p>
+        <p v-if="action.amount !== null">Amount: {{ action.amount }}</p>
+        <p>Note: {{ action.note }}</p>
+        <p><small>[date created]: {{ action.dateCreated }}</small></p>
+    </div>
+</script>
+
+<script type="text/javascript">
+    var AddAction = Vue.component('add-action-component',
+        {
+            template: '#add-action-component',
+            props: ['accrual'],
+            inject: ['addAccrualAction'],
+            data: function() {
+                return {
+                    ui: {
+                        show: false
+                    }, 
+                    adjustment: { }
+                }  
+            },
+            computed: {
+                isDisabled: function() {
+                    // the method returns true if the button should be disabled
+                    // return false if all validations are successful
+                        
+                    if (this.adjustment.accrualAction !== 'ADJUSTMENT') {
+                        return true;
+                    }
+    
+                    var amount = parseInt(this.adjustment.amount);
+                    if (!amount || amount < -40 || amount > 40) {
+                        return true;
+                    }
+                        
+                    var timestamp = Date.parse(this.adjustment.actionDate);
+                    if (isNaN(timestamp) === true) {
+                        return true;
+                    } else {
+                        if (new Date(this.adjustment.actionDate) < new Date(this.accrual.startingDate)) {
+                            return true;
+                        }
+                    }
+                        
+                    if (this.adjustment.note && this.adjustment.note.length > 100) {
+                        return true;
+                    }
+                       
+                    return false;
+                }
+            },
+            methods: {
+                showAdjustmentPopupClick: function() {
+                    var timestamp = new Date();
+                    var initialActionDate = new Date(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate());           
+                    var offset = initialActionDate.getTimezoneOffset(); 
+                    var yourDate = new Date(initialActionDate.getTime() + (offset*60*1000));
+                    var date = yourDate.toISOString().split('T')[0];
+                    
+                    this.adjustment.accrualAction = 'ADJUSTMENT';
+                    this.adjustment.actionDate = date;
+                    this.ui.show = !this.ui.show;
+                },
+                addAccrualActionClick: function() {
+                    var self = this;
+                    this.addAccrualAction(this.adjustment, function() {
+                        self.adjustment = {};
+                        self.ui.show = false;
+                    }); 
+                }
+            }
+        });
+</script>
+<script type="text/x-template" id="add-action-component">
+    <div id="add-action">
+        <h1>Mods</h1>
+        <div style="width: 28em; height: 100%; overflow:auto; background-color: rgba(0,0,0,.5); padding: 10px; border-radius: 5px;"
+            v-if="ui.show">
+            <form @@click.prevent>                
+                <div class="input-group input-group-md col-md-12">
+                    <label for="action-date" class="label label-info">Action Date</label>
+                    <input type="date" class="form-control input-md" placeholder="(mm/dd/yyyy)" 
+                        id="action-date" name="action-date"
+                        v-model="adjustment.actionDate"
+                        />
+                </div>
+                
+                <div class="input-group input-group-md col-md-12">
+                    <label for="amount" class="label label-info">Amount</label>
+                    <select class="form-control selectpicker input-md" data-width="100%" 
+                        id="amount" name="amount"
+                        v-model="adjustment.amount"
+                        >
+                        <option disabled value="">Please select one</option>
+                        <option value="8">8</option>
+                        <option value="-4">-4</option>
+                        <option value="-8">-8</option>
+                        <option value="-16">-16</option>
+                        <option value="-24">-24</option>
+                        <option value="-32">-32</option>
+                        <option value="-40">-40</option>
+                    </select>
+
+                </div>
+                
+                <div class="input-group input-group-md col-md-12">
+                    <label for="note" class="label label-info">Note</label>
+                    <input type="text" class="form-control input-md" placeholder="Add your details" 
+                        id="note" name="note"
+                        v-model="adjustment.note"
+                         />
+                </div>
+                
+                <div class="input-group input-group-md col-md-12">
+                    <button class="btn btn-success btn-block" name="add" style="margin-top: 5px;"
+                        @@click="addAccrualActionClick" :disabled="isDisabled">Create!</button>
+                     <button class="btn btn-warning btn-block" name="close" style="margin: 5px 0;"
+                        @@click="ui.show = !ui.show">Close</button>
+                     <button class="btn btn-danger btn-block" name="close" style="margin: 5px 0;"
+                        @@click="adjustment = {}">Reset</button>
+                </div>
+            </form>
+            
+            <pre>{{ this.$data }}</pre>
+        </div>
+        <div v-if="!ui.show">
+            <button class="btn btn-primary btn-block"
+                @@click="showAdjustmentPopupClick">
+                <small>Add Adjustment</small>
+            </button>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    Vue.use(VeeValidate);
+
+    var app = new Vue({
+        el: '#app',
+        components: {
+            App
+        },
+        render: function(createElement) {
+            return createElement(App);
+        }
+    });
+</script>

@@ -1,0 +1,263 @@
+﻿@{
+}
+
+@await Html.PartialAsync("_VueScriptsPartial")
+
+<div id="app"></div>
+
+<script type="text/x-template" id="default-component">
+    <config-bar-component
+        v-bind:initialConfig="initialConfig"
+        v-on:calculate="calculateReady" />
+</script>
+
+<script type="text/javascript">
+    Vue.use(VeeValidate);
+
+    var App = Vue.component('default-component',
+        {
+            template: '#default-component',
+            data: function() {
+                return {
+                    initialConfig: {},
+                    isReady: false,
+                    actualConfig: {}
+                }
+            },
+            methods: {
+                calculateReady: function(data) {
+                    this.isReady = true;
+                    this.actualConfig = data;
+                    console.log(this.actualConfig);
+                }
+            }
+        });
+</script>
+
+<script type="text/x-template" id="config-bar-component">
+  <div class="row">
+            <h3>New Accrual Calculator</h3>
+
+             <div class="input-group input-group-lg col-lg-12">
+                    <button class="btn btn-info btn-block" name="calculate" 
+                        v-on:click="loadDefaults('biweekly')"><h4 style="margin-top:10px;">Default Biweekly</h4></button>          
+                     <button class="btn btn-info btn-block" name="calculate" 
+                        v-on:click="loadDefaults('semi-monthly')"><h4 style="margin-top:10px;">Default Semi-Monthly</h4></button>
+             </div>
+            
+            <form v-on:submit.prevent="validateBeforeSubmit">
+                <div class="input-group input-group-lg col-lg-12">
+                    <h3><label for="name" class="label label-info label-lg">Name</label></h3>
+                    <input type="text" class="form-control input-lg" placeholder="Give this thing a name" 
+                        id="name" name="name" 
+                        v-model="config.name" 
+                        v-validate="'required'" />
+                    <div class="alert alert-danger" v-if="errors.has('name')">
+                        Name is required.
+                    </div>
+                </div>
+                
+                <div class="input-group input-group-lg col-lg-12">
+                    <h3><label for="starting-hours" class="label label-info label-lg">Starting Hours</label></h3>
+                    <input type="number" class="form-control input-lg" placeholder="The amount of hours currently available" 
+                        id="starting-hours" name="starting-hours" 
+                        v-model="config.startingHours" 
+                        v-validate="'required'" />
+                    <div class="alert alert-danger" v-if="errors.has('starting-hours')">
+                        Starting Hours is required.
+                    </div>
+                </div>
+                
+                <div class="input-group input-group-lg col-lg-12">
+                    <h3><label for="accrual-rate" class="label label-info">Accrual Rate</label></h3>
+                    <input type="number" class="form-control input-lg" placeholder="Amount of hours earned per accrual period" 
+                        id="accrual-rate" name="accrual-rate" 
+                        v-model="config.accrualRate" 
+                        v-validate="'required'" />
+                    <div class="alert alert-danger" v-if="errors.has('accrual-rate')">
+                        Accrual Rate is required.
+                    </div>
+                </div>
+                
+                <div class="input-group input-group-lg col-lg-12">
+                    <h3><label for="max-hours" class="label label-info">Min Hours</label></h3>
+                    <input type="number" class="form-control input-lg" placeholder="Warn me if my available hours goes below" 
+                        id="min-hours" name="min-hours" 
+                        v-model="config.minHours"
+                        v-validate="'required'" />
+                    <div class="alert alert-danger" v-if="errors.has('min-hours')">
+                        Min Hours is required.
+                    </div>
+                </div>
+                
+                <div class="input-group input-group-lg col-lg-12">
+                    <h3><label for="max-hours" class="label label-info">Max Hours</label></h3>
+                    <input type="number" class="form-control input-lg" placeholder="The maximum amount of hours you are allowed to accrue" 
+                        id="max-hours" name="max-hours" 
+                        v-model="config.maxHours"
+                        v-validate="'required'" />
+                    <div class="alert alert-danger" v-if="errors.has('max-hours')">
+                        Max Hours is required.
+                    </div>
+                </div>
+                
+                <div class="input-group input-group-lg col-lg-12">
+                    <h3><label for="accrual-frequency" class="label label-info">Accrual Frequency</label></h3>
+                    <select class="form-control selectpicker input-lg" data-width="100%" 
+                        id="accrual-frequency" name="accrual-frequency"
+                        v-model="config.accrualFrequency">
+                        <option disabled value="">How often do you accrue hours?</option>
+                        <option value="BIWEEKLY">Biweekly</option>
+                        <option value="SEMIMONTHLY">Semi-Monthly</option>
+                    </select>
+                </div>
+                
+                 <div class="input-group input-group-lg col-lg-12" v-if="config.accrualFrequency === 'SEMIMONTHLY'">
+                    <h3><label for="dayOfPayA" class="label label-info">Pay A</label></h3>
+                    <input type="number" class="form-control input-lg" placeholder="Day of Pay A" 
+                        id="dayOfPayA" name="dayOfPayA"
+                        v-model="config.dayOfPayA" 
+                        v-validate="'required'" />
+                    <div class="alert alert-danger" v-if="errors.has('dayOfPayA')">
+                        Pay A is required.
+                    </div>
+                </div>
+
+                <div class="input-group input-group-lg col-lg-12" v-if="config.accrualFrequency === 'SEMIMONTHLY'">
+                    <h3><label for="dayOfPayB" class="label label-info">Pay B</label></h3>
+                    <input type="number" class="form-control input-lg" placeholder="Pay B" 
+                        id="dayOfPayB" name="dayOfPayB"
+                        v-model="config.dayOfPayB" 
+                        v-validate="'required'" />
+                    <div class="alert alert-danger" v-if="errors.has('dayOfPayB')">
+                        Pay B is required.
+                    </div>
+                </div>
+                
+                 <div class="input-group input-group-lg col-lg-12">
+                    <h3><label for="starting-date" class="label label-info">Starting Date</label></h3>
+                    <input type="date" class="form-control input-lg" placeholder="(mm/dd/yyyy)" 
+                        id="starting-date" name="starting-date"
+                         v-model="config.startingDate"
+                         v-validate="'required'" />
+                    <div class="alert alert-danger" v-if="errors.has('starting-date')">
+                        Starting Date is required.
+                    </div>
+                </div>
+
+                <div class="input-group input-group-lg col-lg-12">
+                    <h3><label for="ending" class="label label-info">Ending</label></h3>
+                    <select class="form-control input-lg" data-width="fit" 
+                        id="ending" name="ending"
+                        v-model="config.ending">
+                        <option disabled value="">For how long should this schedule calculate</option>
+                        <option value="CURRENTYEAR">Current Year</option>
+                        <option value="PLUSONE">+1 Year</option>
+                        <option value="PLUSTWO">+2 Years</option>
+                        <option value="PLUSTHREE">+3 Years</option>
+                    </select>
+                </div>
+                <p></p>
+                
+                <div class="input-group input-group-lg col-lg-12">
+                    <button class="btn btn-success btn-block" name="calculate" 
+                        :disabled="errors.any() || !config.name"
+                        v-on:click="click"><h4 style="margin-top:10px;">Create!</h4></button>
+                    <button class="btn btn-warning btn-block" name="calculate" 
+                        v-on:click="loadDefaults('reset')"><h4 style="margin-top:10px;">RESET</h4></button>
+                </div>
+                <p></p>
+            </form>
+            
+            <pre>{{ this.$data }}</pre>
+    </div>
+</script>
+<script type="text/javascript">
+    var ConfigBar = Vue.component('config-bar-component',
+        {
+            template: '#config-bar-component',
+            props: ['initialConfig'],
+            data: function() {
+                return {
+                    config: {
+                        name: this.initialConfig.name,
+                        startingHours: this.initialConfig.initialStartingHours,
+                        accrualRate: this.initialConfig.initialAccrualRate,
+                        maxHours: this.initialConfig.initialMaxHours,
+                        accrualFrequency: this.initialConfig.initialAccrualFrequency,
+                        dayOfPayA: this.initialConfig.initialDayOfPayA,
+                        dayOfPayB: this.initialConfig.initialDayOfPayB,
+                        startingDate: this.initialConfig.initialStartingDate,
+                        ending: this.initialConfig.initialEnding
+                    }
+                }
+            },
+            methods: {
+                loadDefaults: function(which) {
+                    if (which === 'semi-monthly') {
+                        this.config = {
+                            name: 'My First Accrual',
+                            startingHours: 22,
+                            accrualRate: 11,
+                            minHours: 40,
+                            maxHours: 255,
+                            accrualFrequency: 'SEMIMONTHLY',
+                            dayOfPayA: 7,
+                            dayOfPayB: 21,
+                            startingDate: '2018-10-07',
+                            ending: 'PLUSONE'
+                        }
+                    } else if (which === 'biweekly') {
+                        this.config = {
+                            name: 'My First Accrual',
+                            startingHours: 22,
+                            accrualRate: 11,
+                            minHours: 40,
+                            maxHours: 255,
+                            accrualFrequency: 'BIWEEKLY',
+                            startingDate: '2018-10-07',
+                            ending: 'PLUSONE'
+                        }
+                    } else {
+                        this.config = {};
+                    }
+                },
+                validateBeforeSubmit: function(event) {
+                },
+                click: function(event) {
+                    var payload = {
+                        query:
+                            "mutation($accrual:AccrualInputType!) { addAccrual(accrual: $accrual){ accrualId }}",
+                        variables: {
+                            "accrual": this.$data.config
+                        }
+                    };
+
+                    axios.post('/graphql', payload)
+                        .then(function(res) {
+                            console.log(res);
+                            if (res.data.errors) {
+                                alert('Accrual not created. Check the console for information.');
+                                console.log(res);
+                            } else {
+                                window.location.href = '/dashboard/view/' + res.data.data.addAccrual.accrualId;
+                            }
+                        }).catch(function(err) {
+                            console.log('protocol error');
+                            console.log(err);
+                            alert('protocol error');
+                        });
+                }
+            }
+        });
+
+    var app = new Vue({
+        el: '#app',
+        components: {
+            App
+        },
+        render: function(createElement) {
+            return createElement(App);
+        }
+    });
+</script>

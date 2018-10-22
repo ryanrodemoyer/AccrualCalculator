@@ -1,0 +1,26 @@
+version: '3'
+services:
+  web:
+    build: .
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - ASPNETCORE_URLS=https://+:443;http://+:80
+    - ASPNETCORE_HTTPS_PORT=443
+    env_file:
+    - PRIVATE
+    ports:
+    - "50443:443"
+    - "50080:80"
+    volumes:
+    - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
+    - ${HOME}/.aspnet/https:/root/.aspnet/https/
+  mongo:
+    image: mongo:latest
+    environment:
+    - MONGO_DATA_DIR=/data/db
+    - MONGO_LOG_DIR=/dev/null
+    volumes:
+    - ~/Volumes/data/db:/data/db
+    ports:
+    - 37017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet

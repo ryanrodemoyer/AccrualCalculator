@@ -1,0 +1,79 @@
+﻿@model AppName.Web.Models.ContactViewModel
+
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+@section HeadScripts
+{
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+}
+
+@await Html.PartialAsync("_ValidationScriptsPartial")
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+
+<div id="row">
+    @* <div asp-validation-summary="All" class="text-danger"></div> *@
+    
+@*     @if (!ViewData.ModelState.IsValid)   *@
+@*     {   *@
+@*         <ul>   *@
+@*             @foreach (var modelState in ViewData.ModelState.Values)   *@
+@*             {   *@
+@*                 foreach (var error in modelState.Errors)   *@
+@*                 {   *@
+@*                     <li>@error.ErrorMessage</li>   *@
+@*                 }   *@
+@*             }   *@
+@*         </ul>   *@
+@*     }  *@
+    
+    <form asp-action="Contact" asp-controller="Home" method="POST">
+        <div class="row form-group">
+            <label asp-for="Name" class="col-md-2 col-form-label font-weight-bold"></label>
+            <div class="col-md-8">
+                <input asp-for="Name" class="form-control" id="name"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row form-group">
+            <label asp-for="Email" class="col-md-2 col-form-label font-weight-bold"></label>
+            <div class="col-md-8">
+                <input asp-for="Email" class="form-control" id="email"/>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row form-group">
+            <label asp-for="Message" class="col-md-2 col-form-label font-weight-bold"></label>
+            <div class="col-md-8">
+                <textarea asp-for="Message" class="form-control" id="message" rows="7"></textarea>
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10">
+                <div class="pull-right">
+                    <div class="g-recaptcha" data-sitekey="6Le_sHUUAAAAAJ0KYtCViL8sKftwRU7tAm7QoYWl"></div>
+                </div>
+            </div>
+        </div> 
+        @* <div class="row"> *@
+        @*     <div class="col-md-10"> *@
+        @*         <div class="pull-right"> *@
+        @*             $1$ <span asp-validation-for="Recaptcha" class="text-danger"></span> #1# *@
+        @*             <span class="text-danger field-validation-valid" data-valmsg-for="g-recaptcha-response" data-valmsg-replace="true"></span> *@
+        @*         </div> *@
+        @*     </div> *@
+        @* </div>     *@
+        <div class="row form-group">
+            <div class="col-md-offset-2 col-md-8">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-envelope"> Send</i>
+                </button>
+            </div>
+        </div>        
+    </form>
+</div>

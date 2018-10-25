@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -208,6 +209,25 @@ namespace AppName.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMigrationService migrationService)
         {
+//            keeping this as an example
+//            var options = new ForwardedHeadersOptions
+//            {
+//                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+//            };
+//            options.KnownNetworks.Clear();
+//            options.KnownProxies.Clear();
+//            app.UseForwardedHeaders(options);
+                
+            var options = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = 
+                    ForwardedHeaders.XForwardedProto
+//                          forwarding this header breaks all forwarding, i think
+//                        | ForwardedHeaders.XForwardedFor
+            };
+                
+            app.UseForwardedHeaders(options);
+            
             migrationService.ApplyMigrationsAsync().GetAwaiter().GetResult();
 
             if (env.IsDevelopment())

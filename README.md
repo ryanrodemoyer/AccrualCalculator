@@ -1,6 +1,7 @@
 # Accrual Calculator
 
 ## Monitor your paid time off accruals and usage over time
+View me live at https://accrual-calculator-prod.herokuapp.com!
 
 ### Tech Stack
 * macOS + Jetbrains Rider

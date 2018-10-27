@@ -4,6 +4,7 @@ WORKDIR /app
 # Copy csproj and restore as distinct layers
 COPY *.csproj ./
 RUN dotnet restore
+RUN dotnet bundle
 
 # Copy everything else and build
 COPY . ./
@@ -13,4 +14,5 @@ RUN dotnet publish -c Release -o out
 FROM microsoft/dotnet:aspnetcore-runtime
 WORKDIR /app
 COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "AccrualCalculator.Web.dll"]
+
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet AccrualCalculator.Web.dll

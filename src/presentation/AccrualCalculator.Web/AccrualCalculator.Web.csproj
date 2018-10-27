@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BundlerMinifier.Core" Version="2.8.391" />
     <PackageReference Include="GraphQL" Version="2.1.0" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.2.0" />
     <PackageReference Include="GraphQL.Server.Ui.Playground" Version="3.2.0" />
@@ -17,6 +18,10 @@
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.8.391" />
+  </ItemGroup>
+  
   <ItemGroup>
     <Content Update="Views\Dashboard\Create.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>

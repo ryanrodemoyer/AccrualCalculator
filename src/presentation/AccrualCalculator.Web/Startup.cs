@@ -177,6 +177,12 @@ namespace AppName.Web
 //                var database = provider.GetService<IMongoDatabase>();
 //                return new MongoUserStore<MongoIdentityUser>(database);
 //            });
+            
+//            Console.WriteLine("printing config vars");
+//            foreach(var kvp in Configuration.GetChildren())
+//            {
+//                Console.WriteLine($"{kvp.Key}|{kvp.Value}");
+//            }
 
             services.AddSingleton<IMongoDatabase>(provider =>
             {
@@ -334,10 +340,7 @@ namespace AppName.Web
 //            var section = Configuration.GetSection("RECAPTCHA_PRIVATE");
 //            Console.WriteLine($"{section.Key} --- {section.Value}");
 
-//            foreach(var kvp in Configuration.GetChildren())
-//            {
-//                Console.WriteLine($"{kvp.Key}:{ kvp.Value}");
-//            }
+//          
         }
     }
 }

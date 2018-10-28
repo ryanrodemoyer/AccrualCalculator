@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using AppName.Web.DataStructures;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -9,9 +12,13 @@ namespace AppName.Web.Models
     {
         public ObjectId _id { get; set; }
         
-        public string UserId { get; private set; }
+        public string UserId { get; set; }
         
-        public DateTime DateCreated { get; private set; }
+        public string PictureUri { get; set; }
+
+        public string Name { get; set; }
+
+        public DateTime DateCreated { get; set; }
 
         public AppUser(string userId, DateTime dateCreated)
         {
@@ -32,7 +39,6 @@ namespace AppName.Web.Models
 //        public IEnumerable<int> RoleIds { get; private set; }
 //        
 //        [BsonIgnore]
-//        public IEnumerable<AppRole> Roles { get; set; }
 //
 //        public AppUser(string userId, string domain, string userName, bool isActive, string firstName, string lastName, IEnumerable<int> roleIds)
 //        {

@@ -4,17 +4,10 @@
 
 @await Html.PartialAsync("_VueScriptsPartial")
 
-<script type="text/javascript">
-    var accrualFields = 'accrualId accrualRate name startingDate startingHours lastModified hourlyRate isHeart isArchived minHours maxHours accrualFrequency ending dayOfPayA dayOfPayB';
-    
+<script type="text/javascript">    
     var App = Vue.component('default-component',
         {
             template: '#default-component',
-//            data: function() {
-//                return {
-//                    accrual: {}
-//                };
-//            },
             created: function() {
                 this.getAccrual(this, function() {
                     alert('Error retrieving the accrual. Try again.');
@@ -75,6 +68,10 @@
 
 <script type="text/x-template" id="default-component">
     <div class="row">
+        <div class="alert alert-success fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            This is a playground to explore the app and see what it can do. Add time off you've used, change the date and explore! Use the Contact page to send any questions or feedback. Like what you see? Sign up today!
+        </div>
         <div class="col-md-8">
             <div class="row">
                 <h1>{{ accrual.name }}</h1>

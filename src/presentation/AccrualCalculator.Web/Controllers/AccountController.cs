@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using AppName.Web.DataStructures;
 using AppName.Web.Extensions;
 using AppName.Web.Models;
 using AppName.Web.Providers;
@@ -32,7 +34,24 @@ namespace AppName.Web.Controllers
         [Route("/auth/success")]
         public async Task LoginSuccess(string returnUrl = "/")
         {
-            await _userRepository.UpsertUserAsync(new AppUser(HttpContext.User.UserId(), _dotNetProvider.DateTimeNow));
+            var existingUser = await _userRepository.GetUserByUserIdAsync(HttpContext.User.UserId());
+            
+            var user = existingUser ?? new AppUser(HttpContext.User.UserId(), _dotNetProvider.DateTimeNow);
+
+            foreach (var claim in HttpContext.User.Claims)
+            {
+                switch (claim.Type)
+                {
+                    case "picture":
+                        user.PictureUri = claim.Value;
+                        break;
+                    case "name":
+                        user.Name = claim.Value;
+                        break;
+                }
+            }
+            
+            await _userRepository.UpsertUserAsync(user);
             
             Response.Redirect(returnUrl);
         }

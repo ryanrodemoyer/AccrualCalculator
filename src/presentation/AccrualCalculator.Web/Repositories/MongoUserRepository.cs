@@ -38,6 +38,8 @@ namespace AppName.Web.Repositories
             var update = 
                 Builders<AppUser>.Update.Combine(
                 Builders<AppUser>.Update.SetOnInsert(x => x.UserId, user.UserId),
+                Builders<AppUser>.Update.Set(x => x.Name, user.Name),
+                Builders<AppUser>.Update.Set(x => x.PictureUri, user.PictureUri),
                 Builders<AppUser>.Update.SetOnInsert(x => x.DateCreated, user.DateCreated)
                 );
             

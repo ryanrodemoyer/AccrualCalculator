@@ -12,6 +12,7 @@
     <title>Accrual Calculator - @ViewData["Title"]</title>
 
     <environment include="Development">
+        <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css"/>
         <link rel="stylesheet" href="~/css/site.css"/>
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
@@ -19,6 +20,7 @@
               asp-fallback-test-class="" asp-fallback-test-property="" asp-fallback-test-value="">
     </environment>
     <environment exclude="Development">
+        <link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"/>
@@ -175,7 +177,9 @@
     @RenderBody()
     <hr/>
     <footer>
-        <p>&copy; 2018 - @AppSettings.Value.Application.Copyright - <a href="https://github.com/ryanrodemoyer/AccrualCalculator" target="_blank">https://github.com/ryanrodemoyer/AccrualCalculator</a></p>
+        <p>&copy; 2018 - @AppSettings.Value.Application.Copyright - <a href="https://github.com/ryanrodemoyer/AccrualCalculator" target="_blank">https://github.com/ryanrodemoyer/AccrualCalculator</a>
+            <span class="pull-right"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/0OAJgPapt"><img src="https://www.buymeacoffee.com/assets/img/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a></span>
+            </p>
     </footer>
 </div>
 

@@ -1,0 +1,24 @@
+<tr>
+    <td v-if="row.rowId === 0">Starting Row</td>
+    <td v-if="row.rowId === 0">&nbsp;</td>
+
+    @* when using a leading-zero day-of-month format, 
+         javascript subtracts a day from the actual value 
+         ex: "2018-10-07" actually represents October 6th.
+         i have no explanation for this. *@
+    <td v-if="row.rowId > 0">{{row.accrualDate}}</td>
+
+    <td v-if="row.actions.length > 0">
+        <span @@click="">
+            <i class="fas fa-chevron-down"></i>
+        </span>
+    </td>
+    <td v-else></td>
+
+    <td v-if="row.rowId === 0">&nbsp;</td>
+    <td v-else align="center">{{accrualRate}}</td>
+
+    <td v-if="row.rowId > 0" align="center">{{row.hoursUsed}}</td>
+
+    <td align="center">{{row.currentAccrual}}</td>
+</tr>

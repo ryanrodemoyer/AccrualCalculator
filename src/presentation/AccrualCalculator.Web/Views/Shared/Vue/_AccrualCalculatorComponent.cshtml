@@ -1,0 +1,25 @@
+<div class="row">
+    <slot></slot>
+    
+    <div class="col-md-8">
+        <div class="row">
+            <h1>{{ accrual.name }}</h1>
+            <accrual-table-component v-bind:accrual="accrual"></accrual-table-component>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="row">
+            <actions-component :accrual="accrual"></actions-component>
+        </div>
+        <div class="row">
+            <cool-stats-component :accrual="accrual"></cool-stats-component>
+        </div>
+        <div class="row">
+            <add-action-component :accrual="accrual"></add-action-component>
+        </div>
+        <div class="row">
+            <action-history-component :accrual="accrual"></action-history-component>
+        </div>
+    </div>
+</div>

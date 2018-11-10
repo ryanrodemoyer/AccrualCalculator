@@ -1,0 +1,6 @@
+    <div>
+        <h1>Actions</h1>
+        <span><i @@click="updateAccrualClick('heart')" v-bind:class="{redcolor: this.accrual.isHeart}" class="fas fa-heart" style="font-size: 32px;"></i></span>
+        <span><i @@click="updateAccrualClick('archive')" v-bind:class="{bluecolor: this.accrual.isArchived}"  class="fas fa-archive" style="font-size: 32px;"></i></span>
+        <span><i @@click="deleteAccrualClick" class="fas fa-trash" style="font-size: 32px;"></i></span>
+    </div>

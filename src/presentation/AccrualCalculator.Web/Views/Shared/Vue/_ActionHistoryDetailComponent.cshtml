@@ -1,0 +1,11 @@
+    <div>
+        <p>
+            <span v-if="action.accrualAction !== 'CREATED'"><a @@click.prevent="deleteAccrualActionClick"><i class="fas fa-times-circle" style="color: red;"></i></a></span>
+            <strong>Accrual Action: {{ action.accrualAction }}</strong>
+        </p>
+        <p>Action Date: {{ action.actionDate }}</p>
+        <p>Action Id: {{ action.accrualActionId }}</p>
+        <p v-if="action.amount !== null">Amount: {{ action.amount }}</p>
+        <p>Note: {{ action.note }}</p>
+        <p><small>[date created]: {{ action.dateCreated }}</small></p>
+    </div>

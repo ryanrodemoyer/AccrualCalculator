@@ -1,0 +1,11 @@
+    <div>
+        <h1>History</h1>
+        
+        <template v-if="accrual.actions">
+            <action-history-detail-component 
+                v-for="action in accrual.actions.slice().reverse()" 
+                v-bind:action="action"
+                :key="action.accrualActionId">
+            </action-history-detail-component>
+        </template>
+    </div>

@@ -1,4 +1,8 @@
-﻿@model Guid
+﻿@using Microsoft.AspNetCore.Hosting
+
+@model Guid
+
+@inject IHostingEnvironment Env
 
 <div id="app"></div>
 
@@ -51,6 +55,7 @@
     Vue.use(VeeValidate);
     
     var ModelId="@Model";
+    var Environment="@Env.EnvironmentName";
 
     var app = new Vue({
         el: '#app',

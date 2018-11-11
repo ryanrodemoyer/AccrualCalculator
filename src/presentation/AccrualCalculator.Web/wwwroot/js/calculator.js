@@ -4,6 +4,7 @@ var AccrualCalculatorComponent = Vue.component('accrual-calculator-component', {
         this.getAccrual(function () {
             alert('Error retrieving the accrual. Try again.');
         });
+        this.$store.commit('setEnvironment', {name: Environment});
     },
     provide: function () {
         return {
@@ -36,6 +37,13 @@ var AccrualCalculatorComponent = Vue.component('accrual-calculator-component', {
             return a;
         },
         updateAccrual: function (mutated, successCallback, errorCallback) {
+            var nullable = ['hourlyRate','minHours','maxHours','dayOfPayA','dayOfPayB'];
+            for (var i = 0; i < nullable.length; i++) {
+                if (mutated[nullable[i]] === '') {
+                    mutated[nullable[i]] = undefined;
+                }
+            }
+            
             this.$store.dispatch('updateAccrual', {
                 accrual: mutated,
                 successCallback: successCallback,
@@ -157,6 +165,9 @@ Vue.component('cool-stats-component', {
     computed: {
         isView: function () {
             return this.ui.isView;
+        },
+        environment: function() {
+            return this.$store.state.environment;
         }
     },
     created: function () {
@@ -197,6 +208,9 @@ Vue.component('add-action-component', {
         };
     },
     computed: {
+        environment: function() {
+          return this.$store.state.environment;  
+        },
         isDisabled: function () {
             // the method returns true if the button should be disabled
             // return false if all validations are successful
@@ -252,7 +266,8 @@ var accrualFields = 'accrualId accrualRate name startingDate startingHours lastM
 
 var MongoStore = new Vuex.Store({
     state: {
-        accrual: {}
+        accrual: {},
+        environment: {}
     },
     actions: {
         getAccrual: function (context, params) {
@@ -409,6 +424,9 @@ var MongoStore = new Vuex.Store({
         }
     },
     mutations: {
+        setEnvironment: function(state, environment) {
+            Vue.set(state.environment, 'name', environment.name);
+        },
         updateAccrual: function (state, accrual) {
             Vue.set(state, 'accrual', accrual);
         },
@@ -426,7 +444,8 @@ var MongoStore = new Vuex.Store({
 
 var DemoStore = new Vuex.Store({
     state: {
-        accrual: {}
+        accrual: {},
+        environment: {}
     },
     actions: {
         getAccrual: function (context, accrualId, errorCallback) {
@@ -434,6 +453,9 @@ var DemoStore = new Vuex.Store({
         }
     },
     mutations: {
+        setEnvironment: function(state, environment) {
+            Vue.set(state.environment, 'name', environment.name);
+        },
         updateAccrual: function (state, accrual) {
             Vue.set(state.accrual, 'name', accrual.name);
             Vue.set(state.accrual, 'minHours', accrual.minHours);

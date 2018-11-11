@@ -47,7 +47,7 @@
                 </div>
             @* </form> *@
             
-            <pre>{{ this.$data }}</pre>
+            <pre v-if="environment.name === 'Development'">{{ this.$data }}</pre>
         </div>
         <div v-if="!ui.show">
             <button class="btn btn-primary btn-block"

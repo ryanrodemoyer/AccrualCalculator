@@ -432,13 +432,7 @@ var MongoStore = new Vuex.Store({
         },
         deleteAccrual: function (state) {
             Vue.set(state, 'accrual', undefined);
-        },
-        // addAccrualAction: function (state, action) {
-        //
-        // },
-        // deleteAccrualAction: function (state, accrualActionId) {
-        //
-        // }
+        }
     }
 });
 
@@ -450,6 +444,24 @@ var DemoStore = new Vuex.Store({
     actions: {
         getAccrual: function (context, accrualId, errorCallback) {
             context.commit('updateAccrual', _demo);
+        },
+        updateAccrual: function(context, params) {
+            context.commit('updateAccrual', params.accrual);
+            if (params.successCallback) {
+                params.successCallback();
+            }
+        },
+        deleteAccrual: function(context, params) {
+            
+        },
+        addAccrualAction: function(context, params) {
+            context.commit('addAccrualAction', params.adjustment);
+            if (params.successCallback) {
+                params.successCallback();
+            }
+        },
+        deleteAccrualAction: function(context, params) {
+            context.commit('deleteAccrualAction', params.accrualActionId);
         }
     },
     mutations: {
@@ -465,13 +477,19 @@ var DemoStore = new Vuex.Store({
             Vue.set(state.accrual, 'isArchived', accrual.isArchived);
             Vue.set(state.accrual, 'startingDate', accrual.startingDate);
             Vue.set(state.accrual, 'ending', accrual.ending);
+            Vue.set(state.accrual, 'accrualRate', accrual.accrualRate);
             Vue.set(state.accrual, 'accrualFrequency', accrual.accrualFrequency);
             Vue.set(state.accrual, 'hourlyRate', parseInt(accrual.hourlyRate));
             Vue.set(state.accrual, 'dayOfPayA', parseInt(accrual.dayOfPayA));
             Vue.set(state.accrual, 'dayOfPayB', parseInt(accrual.dayOfPayB));
-            Vue.set(state.accrual, 'actions', accrual.actions);
-            Vue.set(state.accrual, 'rows', accrual.rows);
             Vue.set(state.accrual, 'lastModified', new Date().toISOString());
+
+            if (accrual.actions) {
+                Vue.set(state.accrual, 'actions', accrual.actions);
+            }
+            if (accrual.rows) {
+                Vue.set(state.accrual, 'rows', accrual.rows);
+            }
         },
         addAccrualAction: function (state, action) {
             function guid() {

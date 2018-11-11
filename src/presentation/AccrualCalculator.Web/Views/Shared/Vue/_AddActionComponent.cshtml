@@ -2,7 +2,7 @@
         <h1>Mods</h1>
         <div style="width: 28em; height: 100%; overflow:auto; background-color: rgba(0,0,0,.5); padding: 10px; border-radius: 5px;"
             v-if="ui.show">
-            <form @@click.prevent>                
+            @* <form v-on:submit.prevent>                 *@
                 <div class="input-group input-group-md col-md-12">
                     <label for="action-date" class="label label-info">Action Date</label>
                     <input type="date" class="form-control input-md" placeholder="(mm/dd/yyyy)" 
@@ -45,7 +45,7 @@
                      <button class="btn btn-danger btn-block" name="close" style="margin: 5px 0;"
                         @@click="adjustment = {}">Reset</button>
                 </div>
-            </form>
+            @* </form> *@
             
             <pre>{{ this.$data }}</pre>
         </div>

@@ -1,58 +1,60 @@
-    <div id="add-action">
-        <h1>Mods</h1>
-        <div style="width: 28em; height: 100%; overflow:auto; background-color: rgba(0,0,0,.5); padding: 10px; border-radius: 5px;"
-            v-if="ui.show">
-            @* <form v-on:submit.prevent>                 *@
-                <div class="input-group input-group-md col-md-12">
-                    <label for="action-date" class="label label-info">Action Date</label>
-                    <input type="date" class="form-control input-md" placeholder="(mm/dd/yyyy)" 
-                        id="action-date" name="action-date"
-                        v-model="adjustment.actionDate"
-                        />
-                </div>
-                
-                <div class="input-group input-group-md col-md-12">
-                    <label for="amount" class="label label-info">Amount</label>
-                    <select class="form-control selectpicker input-md" data-width="100%" 
-                        id="amount" name="amount"
-                        v-model="adjustment.amount"
-                        >
-                        <option disabled value="">Please select one</option>
-                        <option value="8">8</option>
-                        <option value="-4">-4</option>
-                        <option value="-8">-8</option>
-                        <option value="-16">-16</option>
-                        <option value="-24">-24</option>
-                        <option value="-32">-32</option>
-                        <option value="-40">-40</option>
-                    </select>
-
-                </div>
-                
-                <div class="input-group input-group-md col-md-12">
-                    <label for="note" class="label label-info">Note</label>
-                    <input type="text" class="form-control input-md" placeholder="Add your details" 
-                        id="note" name="note"
-                        v-model="adjustment.note"
-                         />
-                </div>
-                
-                <div class="input-group input-group-md col-md-12">
-                    <button class="btn btn-success btn-block" name="add" style="margin-top: 5px;"
-                        @@click="addAccrualActionClick" :disabled="isDisabled">Create!</button>
-                     <button class="btn btn-warning btn-block" name="close" style="margin: 5px 0;"
-                        @@click="ui.show = !ui.show">Close</button>
-                     <button class="btn btn-danger btn-block" name="close" style="margin: 5px 0;"
-                        @@click="adjustment = {}">Reset</button>
-                </div>
-            @* </form> *@
-            
-            <pre v-if="environment.name === 'Development'">{{ this.$data }}</pre>
+<div id="add-action">
+    <h1>Mods</h1>
+    <div style="height: 100%; overflow: auto; background-color: rgba(0, 0, 0, .5); padding: 10px; border-radius: 5px;"
+         v-if="ui.show">
+        
+        <div class="form-group">
+            <label for="action-date" class="label label-info">Action Date</label>
+            <input type="date" class="form-control" placeholder="(mm/dd/yyyy)"
+                   id="action-date" name="action-date"
+                   v-model="adjustment.actionDate"/>
         </div>
-        <div v-if="!ui.show">
-            <button class="btn btn-primary btn-block"
-                @@click="showAdjustmentPopupClick">
-                <small>Add Adjustment</small>
+
+        <div class="form-group">
+            <label for="amount" class="label label-info">Amount</label>
+            <select class="form-control selectpicker" data-width="100%"
+                    id="amount" name="amount"
+                    v-model="adjustment.amount">
+                <option disabled value="">Please select one</option>
+                <option value="8">8</option>
+                <option value="-4">-4</option>
+                <option value="-8">-8</option>
+                <option value="-16">-16</option>
+                <option value="-24">-24</option>
+                <option value="-32">-32</option>
+                <option value="-40">-40</option>
+            </select>
+
+        </div>
+
+        <div class="form-group">
+            <label for="note" class="label label-info">Note</label>
+            <input type="text" class="form-control" placeholder="Add your details"
+                   id="note" name="note"
+                   v-model="adjustment.note"/>
+        </div>
+
+        <div class="">
+            <button class="btn btn-success btn-block" name="add" style="margin-top: 5px;"
+                    @@click="addAccrualActionClick" :disabled="isDisabled">
+                Create!
+            </button>
+            <button class="btn btn-warning btn-block" name="close" style="margin: 5px 0;"
+                    @@click="ui.show = !ui.show">
+                Close
+            </button>
+            <button class="btn btn-danger btn-block" name="close" style="margin: 5px 0;"
+                    @@click="adjustment = {}">
+                Reset
             </button>
         </div>
+
+        <pre v-if="environment.name === 'Development'">{{ this.$data }}</pre>
     </div>
+    <div v-if="!ui.show">
+        <button class="btn btn-primary btn-block"
+                @@click="showAdjustmentPopupClick">
+            <small>Add Adjustment</small>
+        </button>
+    </div>
+</div>

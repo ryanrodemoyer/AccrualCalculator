@@ -1,38 +1,38 @@
-     <table class="table">
-         <thead>
-         <tr>
-             <th>Date Accrued</th>
-             <th>&nbsp;</th>
-             <th class="text-center">Hours Accrued</th>
-             <th class="text-center">Hours Adjusted</th>
-             <th class="text-center">Total Accrued</th>
-         </tr>
-         </thead>
-         <tbody>
-            <template v-for="row in accrual.rows">
-                <accrual-row-component v-bind:row="row" v-bind:accrualRate="accrual.accrualRate"></accrual-row-component>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Date Accrued</th>
+        <th>&nbsp;</th>
+        <th class="text-center">Hours Accrued</th>
+        <th class="text-center">Hours Adjusted</th>
+        <th class="text-center">Total Accrued</th>
+    </tr>
+    </thead>
+    <tbody>
+    <template v-for="row in accrual.rows">
+        <accrual-row-component v-bind:row="row" v-bind:accrualRate="accrual.accrualRate"></accrual-row-component>
 
-                <template v-if="row.actions !== undefined && row.actions.length > 0">
-                    <td>&nbsp;</td>
-                    <td colspan="3">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th class="text-center">Adjustment</th>
-                                    <th>Note</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="action in row.actions">
-                                    <td>{{ action.actionDate }}</td>
-                                    <td align="center">{{ action.amount }}</td>
-                                    <td>{{ action.note }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </template>
-            </template>
-         </tbody>
-     </table>
+        <template v-if="row.actions !== undefined && row.actions.length > 0">
+            <td>&nbsp;</td>
+            <td colspan="3">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th class="text-center">Adjustment</th>
+                        <th>Note</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="action in row.actions">
+                        <td>{{ action.actionDate }}</td>
+                        <td class="text-center">{{ action.amount }}</td>
+                        <td>{{ action.note }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </template>
+    </template>
+    </tbody>
+</table>
